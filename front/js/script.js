@@ -1,17 +1,13 @@
-
 fetch("http://localhost:3000/api/products")
-.then(function (res) {
-    if (res.ok) {
-        return res.json();
-    }
-})
-.then(function (value) {
-    console.log(value);
-    
-    // const productLength = value.length;
-    
-    let affichage = ``;
+    .then(function (res) {
+        if (res.ok) {
+            return res.json();
+        }
+    })
+    .then(function (value) {
+        console.log(value);
 
+        let affichage = ``;
 
         for (let product of value) {
             affichage += `
