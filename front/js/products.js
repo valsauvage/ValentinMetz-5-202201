@@ -28,15 +28,39 @@ fetch("http://localhost:3000/api/products")
                 document
                     .getElementById('description')
                     .innerHTML = value[i].description;
-                    
-                // document
-                //     .getElementById('colors')
-                //     .innerHTML = value[i].colors;
 
+                let colorList = value[i].colors.length;
+                let colorKey = Object.values(value[i].colors);
+                let affichage = ``;
+
+                for (let j = 0; j < colorList; j++) {
+                    affichage += `<option id="color-value" value="${colorKey[j]}">${colorKey[j]}</option>`;
+                    document
+                        .getElementById('colors')
+                        .innerHTML = affichage;
+                }
             }
         }
 
         const productIndex = value.hasOwnProperty(0);
+
+        let submit = document.getElementById('addToCart');
+        
+        submit.onclick = function() {
+
+            let select = document.getElementById('colors');
+            let selectedColor = select.options[select.selectedIndex].value;
+            
+            let quantity = document.getElementById('quantity').value;
+            
+            localStorage.clear();
+            localStorage.setItem('id', productId);
+            localStorage.setItem('color', selectedColor);
+            localStorage.setItem('quantity', quantity);
+            
+            console.log(localStorage);
+        };
+
 
 
     })
