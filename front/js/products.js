@@ -49,25 +49,35 @@ fetch(productUrl)
 
         submit.onclick = function addProduct() {
 
+
             // fonction pour vérifier si une couleur a bien été selectionnée
             const select = document.getElementById('colors');
             const selectedColor = select.options[select.selectedIndex].value;
 
+            // Fonction d'affichage du popup
+            const popup = function () {
+                if (window.confirm(`${value.name} couleur: ${selectedColor} a bien été ajouté au panier.
+                Cliquez sur OK pour voir votre panier, ou sur ANNULER pour revenir au magasin.`)) {
+                    window.location.href = "cart.html";
+
+                } else {
+                    window.location.href = "index.html";
+                }
+            };
+
             if (selectedColor.length == 0) {
                 alert('veuillez sélectionner une couleur svp')
             }
-            
+
             else {
                 // récupération de la quantité
                 let quantity = document.getElementById('quantity').value;
 
-
-                // Définition du PRODUCT ARRAY
+                // Définition de l'objet produit en array
                 const product = { id: productId, name: value.name, quantity: quantity, color: selectedColor, price: value.price, image: value.imageUrl };
 
                 // On récupère le panier, s'il n'existe pas, il est créé automatiquement
                 const cart = JSON.parse(localStorage.getItem("cart")) || [];
-                console.log("🚀 ~ file: products.js ~ line 70 ~ addProduct ~ cart", cart)
 
                 // GESTION DE QUANTITÉ
                 // 1. Le produit existe déjà ?
@@ -80,22 +90,19 @@ fetch(productUrl)
                 }
 
                 // 3. si il n'existe pas, on le rajoute
-
                 else {
                     product.color = selectedColor;
                     product.quantity = quantity;
                     cart.push(product);
                 }
 
-                // On ajoute les données
+                // On ajoute les données au panier
                 localStorage.setItem("cart", JSON.stringify(cart));
 
-                alert('Produit ajouté à votre panier !');
+                // Popup produit ajouté à votre panier
+                popup();
             }
-
         };
-
-
     })
     .catch(function (err) {
         console.log('Erreur');
