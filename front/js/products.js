@@ -49,7 +49,6 @@ fetch(productUrl)
 
         submit.onclick = function addProduct() {
 
-
             // fonction pour vérifier si une couleur a bien été selectionnée
             const select = document.getElementById('colors');
             const selectedColor = select.options[select.selectedIndex].value;
@@ -102,6 +101,7 @@ fetch(productUrl)
                 // Popup produit ajouté à votre panier
                 popup();
             }
+            return false;
         };
     })
     .catch(function (err) {
