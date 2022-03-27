@@ -69,29 +69,36 @@ fetch(productUrl)
             }
 
             else {
-                // récupération de la quantité
-                let quantity = document.getElementById('quantity').value;
+                // récupération de la quantité selectionnée
+                let selectedQuantity = document.getElementById('quantity').value;
 
                 // Définition de l'objet produit en array
                 const product = { id: productId, name: value.name, quantity: quantity, color: selectedColor, price: value.price, image: value.imageUrl };
 
                 // On récupère le panier, s'il n'existe pas, il est créé automatiquement
                 const cart = JSON.parse(localStorage.getItem("cart")) || [];
+                // On ajoute les données au panier
 
                 // GESTION DE QUANTITÉ
                 // 1. Le produit existe déjà ?
                 // utilisation de la méthode .find
                 const founded = cart.find(e => e.id === product.id && e.color === product.color);
 
+                // const quantityNumber = parseInt(quantity);
+                // const foundedQuantityNumber = parseInt(founded.quantity);
+
                 // 2. si il existe, on met la quantité à jour
                 if (founded) {
-                    founded.quantity += quantity;
+                    let foundedNumber = Number(founded.quantity);
+                    let selectedNumber = Number(selectedQuantity);
+                    founded.quantity = selectedNumber += foundedNumber;
+
                 }
 
                 // 3. si il n'existe pas, on le rajoute
                 else {
                     product.color = selectedColor;
-                    product.quantity = quantity;
+                    product.quantity = selectedQuantity;
                     cart.push(product);
                 }
 
@@ -99,7 +106,7 @@ fetch(productUrl)
                 localStorage.setItem("cart", JSON.stringify(cart));
 
                 // Popup produit ajouté à votre panier
-                popup();
+                // popup();
             }
             return false;
         };
