@@ -167,7 +167,82 @@ getTotalPrice();
 
 
 
-    // VALIDATION DU FORMULAIRE
-    // --> validation de formulaire html (min-lenght, max-lenght, regex, etc.)
+// VALIDATION DU FORMULAIRE
+// --> validation de formulaire html (min-lenght, max-lenght, regex, etc.)
 
-    // ENVOYER LES INOFS AVEC fetch POST
+// Éléments du formulaire
+const firstName = document.getElementById('firstName');
+const lastName = document.getElementById('lastName');
+const address = document.getElementById('address');
+const city = document.getElementById('city');
+const email = document.getElementById('email');
+
+
+// Éléments de gestion des erreurs
+// const firstNameMessage = document.getElementById('firstNameErrorMsg');
+// const lastNameMessage = document.getElementById('lastNameErrorMsg');
+// const addressMessage = document.getElementById('addressErrorMsg');
+// const cityMessage = document.getElementById('cityErrorMsg');
+// const emailMessage = document.getElementById('emailErrorMsg');
+
+// Récupération du bouton d'envoi
+const orderButton = document.getElementById('order');
+
+// Récupération des données du formulaire dans localStorage
+const form = JSON.parse(localStorage.getItem("form"));
+firstName.value = form.prenom;
+lastName.value = form.name;
+address.value = form.address;
+city.value = form.city;
+email.value = form.email;
+
+// Fonction d'affichage de l'erreur
+// const showError = (input, message) => {
+//   // add the error class
+//   input.classList.add('error');
+
+//   // show the error message
+//   const error = document.getElementById(input + 'ErrorMsg');
+//   error.innerHTML = message;
+// };
+
+// // Fonction d'affichage de succès
+// const showSuccess = (input) => {
+//   // remove the error class
+//   input.classList.remove('error');
+
+//   // remove the error message
+//   const error = input.querySelector('ErrorMsg');
+//   error.innerHTML = '';
+// };
+
+const htmlForm = document.querySelector('form');
+console.log('htmlForm', htmlForm)
+
+// BOUTON ENVOYER
+orderButton.addEventListener('click', (event) => {
+  event.preventDefault();
+
+  // if (!email.validity.valid) {
+  //   // Vérification de l'email
+  //   showError(email, "J'attends une adresse e-mail correcte, mon cher&nbsp;!");
+  //   // Et on empêche l'envoi des données du formulaire
+  //   event.preventDefault();
+  // } else {
+  //   showSuccess(email);
+
+  if (htmlForm.checkValidity()) {
+    alert('Votre commande a bien été envoyée !');
+    // Définition de l'objet formulaire en array et envoi dans le localStorage
+    const formInfos = { prenom: firstName.value, name: lastName.value, address: address.value, city: city.value, email: email.value };
+    localStorage.setItem('form', JSON.stringify(formInfos));
+  }
+  else {
+    //Validate Form
+    htmlForm.reportValidity();
+  }
+  
+});
+
+
+    // AVEC fetch POST
