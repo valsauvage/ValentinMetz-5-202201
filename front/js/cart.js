@@ -2,7 +2,7 @@
 // Récupération des données du panier
 let cart = '';
 function getCart() {
-  cart = JSON.parse(localStorage.getItem('cart')) || [];
+  cart = JSON.parse(localStorage.getItem('products')) || [];
 }
 getCart();
 
@@ -74,7 +74,7 @@ for (let j = 0; j < cart.length; j++) {
     }
 
     // On met à jour les données au panier
-    localStorage.setItem("cart", JSON.stringify(cart));
+    localStorage.setItem("products", JSON.stringify(cart));
 
     // suppression de la balise article
     getArticleId.parentNode.removeChild(getArticleId);
@@ -105,7 +105,7 @@ for (let k = 0; k < cart.length; k++) {
     itemToChange.quantity = newQty;
 
     // On ajoute les données au panier
-    localStorage.setItem("cart", JSON.stringify(cart));
+    localStorage.setItem("products", JSON.stringify(cart));
 
     // Mise à jour de la quantité et du prix total
     getTotalPrice();
@@ -171,78 +171,70 @@ getTotalPrice();
 // --> validation de formulaire html (min-lenght, max-lenght, regex, etc.)
 
 // Éléments du formulaire
-const firstName = document.getElementById('firstName');
-const lastName = document.getElementById('lastName');
-const address = document.getElementById('address');
-const city = document.getElementById('city');
-const email = document.getElementById('email');
+const sendFirstName = document.getElementById('firstName');
+const sendLastName = document.getElementById('lastName');
+const sendAddress = document.getElementById('address');
+const sendCity = document.getElementById('city');
+const sendEmail = document.getElementById('email');
 
-
-// Éléments de gestion des erreurs
-// const firstNameMessage = document.getElementById('firstNameErrorMsg');
-// const lastNameMessage = document.getElementById('lastNameErrorMsg');
-// const addressMessage = document.getElementById('addressErrorMsg');
-// const cityMessage = document.getElementById('cityErrorMsg');
-// const emailMessage = document.getElementById('emailErrorMsg');
 
 // Récupération du bouton d'envoi
 const orderButton = document.getElementById('order');
 
 // Récupération des données du formulaire dans localStorage
-const form = JSON.parse(localStorage.getItem("form"));
-firstName.value = form.prenom;
-lastName.value = form.name;
-address.value = form.address;
-city.value = form.city;
-email.value = form.email;
+const form = JSON.parse(localStorage.getItem("contact"));
 
-// Fonction d'affichage de l'erreur
-// const showError = (input, message) => {
-//   // add the error class
-//   input.classList.add('error');
+if (form) {
+  sendFirstName.value = form.firstName;
+  sendLastName.value = form.lastName;
+  sendAddress.value = form.address;
+  sendCity.value = form.city;
+  sendEmail.value = form.email;
+}
 
-//   // show the error message
-//   const error = document.getElementById(input + 'ErrorMsg');
-//   error.innerHTML = message;
-// };
-
-// // Fonction d'affichage de succès
-// const showSuccess = (input) => {
-//   // remove the error class
-//   input.classList.remove('error');
-
-//   // remove the error message
-//   const error = input.querySelector('ErrorMsg');
-//   error.innerHTML = '';
-// };
 
 const htmlForm = document.querySelector('form');
-console.log('htmlForm', htmlForm)
+
 
 // BOUTON ENVOYER
 orderButton.addEventListener('click', (event) => {
   event.preventDefault();
 
-  // if (!email.validity.valid) {
-  //   // Vérification de l'email
-  //   showError(email, "J'attends une adresse e-mail correcte, mon cher&nbsp;!");
-  //   // Et on empêche l'envoi des données du formulaire
-  //   event.preventDefault();
-  // } else {
-  //   showSuccess(email);
-
   if (htmlForm.checkValidity()) {
     alert('Votre commande a bien été envoyée !');
     // Définition de l'objet formulaire en array et envoi dans le localStorage
-    const formInfos = { prenom: firstName.value, name: lastName.value, address: address.value, city: city.value, email: email.value };
-    localStorage.setItem('form', JSON.stringify(formInfos));
-  }
-  else {
+    const formInfos = { firstName: sendFirstName.value, lastName: sendLastName.value, address: sendAddress.value, city: sendCity.value, email: sendEmail.value };
+    localStorage.setItem('contact', JSON.stringify(formInfos));
+
+    sendForm();
+
+  } else {
     //Validate Form
     htmlForm.reportValidity();
   }
-  
 });
 
 
-    // AVEC fetch POST
+// FONCTION POUR ENVOYER LE FORMULAIRE AU SERVEUR AVEC FETCH POST
+function sendForm() {
+
+  // Les données à envoyer
+  const data = {form, cart};
+
+fetch("http://localhost:3000/api/products/order", {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: { 'Content-Type': 'application/json' }
+  })
+    .then(function (response) {
+      if (response.ok) {
+        console.log(response.json());
+      }
+    })
+    .catch(function (error) {
+      console.log(error);
+      alert("Erreur d'envoi du formulaire");
+    });
+};
+
+sendForm();
