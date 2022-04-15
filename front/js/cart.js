@@ -202,11 +202,11 @@ orderButton.addEventListener('click', (event) => {
 
   if (htmlForm.checkValidity()) {
     alert('Votre commande a bien été envoyée !');
-    // Définition de l'objet formulaire en array et envoi dans le localStorage
-    const formInfos = { firstName: sendFirstName.value, lastName: sendLastName.value, address: sendAddress.value, city: sendCity.value, email: sendEmail.value };
-    localStorage.setItem('contact', JSON.stringify(formInfos));
+    // envoi de form dans le localStorage
+    const form = { firstName: sendFirstName.value, lastName: sendLastName.value, address: sendAddress.value, city: sendCity.value, email: sendEmail.value };
+    localStorage.setItem('contact', JSON.stringify(form));
 
-    sendForm();
+    sendOrder();
 
   } else {
     //Validate Form
@@ -216,25 +216,28 @@ orderButton.addEventListener('click', (event) => {
 
 
 // FONCTION POUR ENVOYER LE FORMULAIRE AU SERVEUR AVEC FETCH POST
-function sendForm() {
+function sendOrder() {
 
-  // Les données à envoyer
-  const data = {form, cart};
+  const products = Object.values(cart).map((product) => {
+    return product.id
+  });
 
-fetch("http://localhost:3000/api/products/order", {
-    method: "POST",
-    body: JSON.stringify(data),
-    headers: { 'Content-Type': 'application/json' }
+  const order = {
+    contact: form,
+    products: products,
+  };
+
+  fetch('http://localhost:3000/api/products/order', {
+    method: 'POST',
+    body: JSON.stringify(order),
+    headers: { 'Content-Type': 'application/json; charset=utf-8' }
   })
-    .then(function (response) {
-      if (response.ok) {
-        console.log(response.json());
-      }
+    .then((response) => response.json())
+    .then((json) => {
+      // localStorage.clear();
+      window.location.href = `${window.location.origin}/front/html/confirmation.html?orderId=${json.orderId}`
     })
-    .catch(function (error) {
-      console.log(error);
-      alert("Erreur d'envoi du formulaire");
-    });
+    .catch(() => {
+      alert(error)
+    })
 };
-
-sendForm();

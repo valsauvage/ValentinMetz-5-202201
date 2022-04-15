@@ -1,9 +1,9 @@
 // récupération de l'url du produit
-let urlData = new URLSearchParams(window.location.search);
+const urlData = new URLSearchParams(window.location.search);
 // récupération de l'ID du produit
-let productId = urlData.get('id');
+const productId = urlData.get('id');
 // définition de l'url complet du produit
-let productUrl = "http://localhost:3000/api/products/" + productId;
+const productUrl = "http://localhost:3000/api/products/" + productId;
 
 fetch(productUrl)
     .then(function (res) {
