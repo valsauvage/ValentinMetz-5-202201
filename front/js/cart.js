@@ -234,7 +234,7 @@ function sendOrder() {
   })
     .then((response) => response.json())
     .then((json) => {
-      // localStorage.clear();
+      localStorage.clear();
       window.location.href = `${window.location.origin}/front/html/confirmation.html?orderId=${json.orderId}`
     })
     .catch(() => {
