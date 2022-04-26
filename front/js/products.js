@@ -91,9 +91,6 @@ fetch(productUrl)
                 // utilisation de la méthode .find
                 const founded = cart.find(e => e.id === product.id && e.color === product.color);
 
-                // const quantityNumber = parseInt(quantity);
-                // const foundedQuantityNumber = parseInt(founded.quantity);
-
                 // 2. si il existe, on met la quantité à jour
                 if (founded) {
                     let foundedNumber = Number(founded.quantity);
