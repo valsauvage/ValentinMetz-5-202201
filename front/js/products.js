@@ -41,15 +41,15 @@ fetch(productUrl)
                 .innerHTML += `<option id="color-value" value="${colorKey[i]}">${colorKey[i]}</option>`;
         }
 
-
         const productIndex = value.hasOwnProperty(0);
 
-        // définition de la fonction à déclencher au clic sur le bouton "ajouter au panier"
+        // Récupération du bouton "ajouter au panier"
         let submit = document.getElementById('addToCart');
 
+        // au clic sur le bouton
         submit.onclick = function addProduct() {
 
-            // fonction pour vérifier si une couleur a bien été selectionnée
+            // vérifier si une couleur a bien été selectionnée
             const select = document.getElementById('colors');
             const selectedColor = select.options[select.selectedIndex].value;
             
@@ -80,7 +80,7 @@ fetch(productUrl)
             else {
 
                 // Définition de l'objet produit en array
-                const product = { id: productId, name: value.name, quantity: quantity, color: selectedColor, price: value.price, image: value.imageUrl };
+                const product = { id: productId, name: value.name, quantity: quantity, color: selectedColor, image: value.imageUrl };
 
                 // On récupère le panier, s'il n'existe pas, il est créé automatiquement
                 const cart = JSON.parse(localStorage.getItem("products")) || [];
@@ -118,4 +118,3 @@ fetch(productUrl)
     .catch(function (err) {
         console.log('Erreur');
     });
-

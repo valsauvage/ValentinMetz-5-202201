@@ -3,6 +3,49 @@
 let cart = '';
 function getCart() {
   cart = JSON.parse(localStorage.getItem('products')) || [];
+
+  fetch("http://localhost:3000/api/products")
+    .then(function (res) {
+      if (res.ok) {
+        return res.json();
+      }
+    })
+    .then(function (value) {
+
+      // on récupère les id des produits
+      const productArray = [];
+
+        for (let product of value) {
+          // console.log(product._id);
+          // console.log(product.price);
+          productArray.push(product._id);
+        };
+
+        const productIds = productArray.values();
+        console.log('productIds', productIds);
+
+      // On récupère l'id des produits dans le panier
+      for (let h = 0; h < cart.length; h++) {
+        console.log('cart[h].id', cart[h].id)
+
+        let idFind = cart.find(e => e.id === );
+
+        // const idFind = cart.find(e => e.id === cart[h].id === productIds.value);
+        // console.log('idFind', idFind);
+
+    // Récupération de l'index de l'élément à supprimer
+    // const index = cart.indexOf(itemToDelete);
+
+      };
+
+
+      // on les stock dans une tableau
+      // const productPrices = product.price;
+
+    })
+    .catch(function (err) {
+      console.log('Erreur');
+    });
 }
 getCart();
 
@@ -28,7 +71,9 @@ else {
           <div class="cart__item__content__description">
           <h2>${cart[i].name}</h2>
           <p>${cart[i].color}</p>
+
           <p>${cart[i].price} €</p>
+
           </div>
           <div class="cart__item__content__settings">
           <div class="cart__item__content__settings__quantity">
@@ -62,6 +107,7 @@ for (let j = 0; j < cart.length; j++) {
     // Récupération des éléments
     // élément à supprimer du panier
     const itemToDelete = cart.find(e => e.id === cart[j].id && e.color === cart[j].color);
+
     // Balise à supprimer du DOM
     const getArticleId = document.querySelector('[data-id="' + cart[j].id + '"]' + '[data-color="' + cart[j].color + '"]');
 
@@ -234,7 +280,6 @@ function sendOrder() {
   })
     .then((response) => response.json())
     .then((json) => {
-      localStorage.clear();
       window.location.href = `${window.location.origin}/front/html/confirmation.html?orderId=${json.orderId}`
     })
     .catch(() => {
