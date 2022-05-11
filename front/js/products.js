@@ -80,7 +80,9 @@ fetch(productUrl)
             else {
 
                 // Définition de l'objet produit en array
-                const product = { id: productId, name: value.name, quantity: quantity, color: selectedColor, image: value.imageUrl };
+                
+                // const product = { id: productId, name: value.name, quantity: quantity, color: selectedColor, image: value.imageUrl };
+                const product = { id: productId, name: value.name, quantity: quantity, color: selectedColor, price: value.price, image: value.imageUrl };
 
                 // On récupère le panier, s'il n'existe pas, il est créé automatiquement
                 const cart = JSON.parse(localStorage.getItem("products")) || [];

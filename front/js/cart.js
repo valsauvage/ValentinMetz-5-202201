@@ -1,53 +1,46 @@
 
 // Récupération des données du panier
 let cart = '';
+// let cartList = [];
+// let api = '';
+// let apiList = [];
+
 function getCart() {
   cart = JSON.parse(localStorage.getItem('products')) || [];
 
-  fetch("http://localhost:3000/api/products")
-    .then(function (res) {
-      if (res.ok) {
-        return res.json();
-      }
-    })
-    .then(function (value) {
+  // for (let g = 0; g < cart.length; g++) {
+  //   const cartId = cart[g].id;
+  //   cartList.push(cartId);
+  // }
+};
 
-      // on récupère les id des produits
-      const productArray = [];
-
-        for (let product of value) {
-          // console.log(product._id);
-          // console.log(product.price);
-          productArray.push(product._id);
-        };
-
-        const productIds = productArray.values();
-        console.log('productIds', productIds);
-
-      // On récupère l'id des produits dans le panier
-      for (let h = 0; h < cart.length; h++) {
-        console.log('cart[h].id', cart[h].id)
-
-        let idFind = cart.find(e => e.id === );
-
-        // const idFind = cart.find(e => e.id === cart[h].id === productIds.value);
-        // console.log('idFind', idFind);
-
-    // Récupération de l'index de l'élément à supprimer
-    // const index = cart.indexOf(itemToDelete);
-
-      };
-
-
-      // on les stock dans une tableau
-      // const productPrices = product.price;
-
-    })
-    .catch(function (err) {
-      console.log('Erreur');
-    });
-}
 getCart();
+
+// function getApi() {
+//   fetch("http://localhost:3000/api/products")
+//     .then(function (res) {
+//       if (res.ok) {
+//         return res.json();
+//       }
+//     })
+//     .then(function (value) {
+//       api = value;
+//       for (let h = 0; h < api.length; h++) {
+//         const apiId = api[h]._id;
+//         apiList.push(apiId);
+//       }
+//     })
+
+//     .catch(function (err) {
+//       console.log('Erreur');
+//     });
+// };
+
+// getApi();
+
+// console.log(cartList);
+// console.log(apiList);
+
 
 // la div qui contient les caractéristiques
 const affichageDiv = document.getElementById('cart__items');
@@ -71,9 +64,7 @@ else {
           <div class="cart__item__content__description">
           <h2>${cart[i].name}</h2>
           <p>${cart[i].color}</p>
-
           <p>${cart[i].price} €</p>
-
           </div>
           <div class="cart__item__content__settings">
           <div class="cart__item__content__settings__quantity">
@@ -173,6 +164,7 @@ function getTotalPrice() {
 
     // je récupère les quantités
     let cartQty = cart[l].quantity;
+
     // je multiplie les prix par la quantité de chaque produit
     let cartPrices = cart[l].price * cart[l].quantity;
 
@@ -242,17 +234,42 @@ if (form) {
 const htmlForm = document.querySelector('form');
 
 
+
 // BOUTON ENVOYER
 orderButton.addEventListener('click', (event) => {
   event.preventDefault();
 
   if (htmlForm.checkValidity()) {
-    alert('Votre commande a bien été envoyée !');
     // envoi de form dans le localStorage
     const form = { firstName: sendFirstName.value, lastName: sendLastName.value, address: sendAddress.value, city: sendCity.value, email: sendEmail.value };
     localStorage.setItem('contact', JSON.stringify(form));
 
-    sendOrder();
+    alert('Votre commande a bien été envoyée !');
+
+    const products = Object.values(cart).map((product) => {
+      return product.id
+    });
+  
+    const order = {
+      contact: form,
+      products: products,
+    };
+  
+    async function post() {
+      const waiting = await fetch('http://localhost:3000/api/products/order', {
+        method: 'POST',
+        body: JSON.stringify(order),
+        headers: { 'Content-Type': 'application/json; charset=utf-8' }
+      })
+        .then((response) => response.json())
+        .then((json) => {
+          window.location.href = `${window.location.origin}/front/html/confirmation.html?orderId=${json.orderId}`
+        })
+        .catch(() => {
+          alert(error)
+        })
+    }
+    post();
 
   } else {
     //Validate Form
@@ -260,29 +277,3 @@ orderButton.addEventListener('click', (event) => {
   }
 });
 
-
-// FONCTION POUR ENVOYER LE FORMULAIRE AU SERVEUR AVEC FETCH POST
-function sendOrder() {
-
-  const products = Object.values(cart).map((product) => {
-    return product.id
-  });
-
-  const order = {
-    contact: form,
-    products: products,
-  };
-
-  fetch('http://localhost:3000/api/products/order', {
-    method: 'POST',
-    body: JSON.stringify(order),
-    headers: { 'Content-Type': 'application/json; charset=utf-8' }
-  })
-    .then((response) => response.json())
-    .then((json) => {
-      window.location.href = `${window.location.origin}/front/html/confirmation.html?orderId=${json.orderId}`
-    })
-    .catch(() => {
-      alert(error)
-    })
-};

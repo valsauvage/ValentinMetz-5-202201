@@ -7,3 +7,5 @@ const orderId = urlData.get('orderId');
 
 // affichage de l'id de la commande
 confirmationElement.innerText = orderId;
+
+// localStorage.clear();
