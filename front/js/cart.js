@@ -1,63 +1,39 @@
 
 // Récupération des données du panier
 let cart = '';
-// let cartList = [];
-// let api = '';
-// let apiList = [];
-
-function getCart() {
-  cart = JSON.parse(localStorage.getItem('products')) || [];
-
-  // for (let g = 0; g < cart.length; g++) {
-  //   const cartId = cart[g].id;
-  //   cartList.push(cartId);
-  // }
-};
-
-getCart();
-
-// function getApi() {
-//   fetch("http://localhost:3000/api/products")
-//     .then(function (res) {
-//       if (res.ok) {
-//         return res.json();
-//       }
-//     })
-//     .then(function (value) {
-//       api = value;
-//       for (let h = 0; h < api.length; h++) {
-//         const apiId = api[h]._id;
-//         apiList.push(apiId);
-//       }
-//     })
-
-//     .catch(function (err) {
-//       console.log('Erreur');
-//     });
-// };
-
-// getApi();
-
-// console.log(cartList);
-// console.log(apiList);
+function getCart() { cart = JSON.parse(localStorage.getItem('products')) || []; }
 
 
-// la div qui contient les caractéristiques
-const affichageDiv = document.getElementById('cart__items');
+// Récupération du prix de chaque produit depuis l'API
+fetch("http://localhost:3000/api/products")
+  .then(function (res) {
+    if (res.ok) {
+      return res.json();
+    }
+  })
+  .then(function (value) {
+    for (let item of cart) {
+      const founded = value.find(e => e._id === item.id);
+      item.price = founded.price;
+    };
 
-// affichage du panier vide
-if (cart.length == 0) {
-  const emptyCart = `<h2>Votre panier est vide</h2>`;
-  affichageDiv.innerHTML = emptyCart;
-}
-else {
+    // Affichage des produits
+    // la div qui contient les caractéristiques
+    const affichageDiv = document.getElementById('cart__items');
 
-  // Les caractéristiques du produit
-  for (let i = 0; i < cart.length; i++) {
+    // affichage du panier vide
+    if (cart.length == 0) {
+      const emptyCart = `<h2>Votre panier est vide</h2>`;
+      affichageDiv.innerHTML = emptyCart;
+    }
+    else {
 
-    const productData =
-      `<article class="cart__item" data-id="${cart[i].id}" data-color="${cart[i].color}">
-        <div class="cart__item__img">
+      // Les caractéristiques du produit
+      for (let i = 0; i < cart.length; i++) {
+
+        const productData =
+          `<article class="cart__item" data-id="${cart[i].id}" data-color="${cart[i].color}">
+          <div class="cart__item__img">
           <img src="${cart[i].image}" alt="Photographie d'un canapé">
           </div>
           <div class="cart__item__content">
@@ -78,131 +54,127 @@ else {
           </div>
           </article>`;
 
+        // AFFICHAGE DES PRODUITS
+        const affichageProduits = affichageDiv.insertAdjacentHTML('beforeend', productData);
+      };
+    };
 
-    // AFFICHAGE DES PRODUITS
-    const affichageProduits = affichageDiv.insertAdjacentHTML('beforeend', productData);
-  };
-};
+    // Gestion du bouton supprimmer
+    const deleteBtn = document.getElementsByClassName('deleteItem');
+
+    for (let j = 0; j < cart.length; j++) {
+
+      deleteBtn[j].addEventListener('click', (event) => {
+        event.preventDefault();
+
+        // Récupération des éléments
+        // élément à supprimer du panier
+        const itemToDelete = cart.find(e => e.id === cart[j].id && e.color === cart[j].color);
+
+        // Balise à supprimer du DOM
+        const getArticleId = document.querySelector('[data-id="' + cart[j].id + '"]' + '[data-color="' + cart[j].color + '"]');
+
+        // Récupération de l'index de l'élément à supprimer
+        const index = cart.indexOf(itemToDelete);
+
+        // Suppression de l'élément
+        if (index > -1) {
+          cart.splice(index, 1);
+        }
+
+        // On met à jour les données au panier
+        localStorage.setItem("products", JSON.stringify(cart));
+
+        // suppression de la balise article
+        getArticleId.parentNode.removeChild(getArticleId);
+
+        // Mise à jour du prix et de la quantité
+        getTotalPrice();
+        getCart();
+
+      });
+    };
+
+    // Détection de l'ajout de quantité
+    const changeQty = document.getElementsByClassName('itemQuantity');
+
+    for (let k = 0; k < cart.length; k++) {
+      changeQty[k].addEventListener('change', (event) => {
+        event.preventDefault();
 
 
+        const itemToChange = cart.find(e => e.id === cart[k].id && e.color === cart[k].color);
+
+        // on récupère la valeur de la quantité
+        const newQty = changeQty[k].value;
+
+        // on met à jour la nouvelle quantité
+        itemToChange.quantity = newQty;
+
+        // On ajoute les données au panier
+        localStorage.setItem("products", JSON.stringify(cart));
+
+        // Mise à jour de la quantité et du prix total
+        getTotalPrice();
+        getCart();
+      });
+    };
+
+    // CALCUL DU PRIX ET DE LA QUANTITÉ DU PANIER
+    function getTotalPrice() {
+
+      let totalQtyCalc = [];
+      let totalPriceCalc = [];
+
+      // récuération des prix des produits
+      for (let l = 0; l < cart.length; l++) {
+
+        // je récupère les quantités
+        let cartQty = cart[l].quantity;
+
+        // je multiplie les prix par la quantité de chaque produit
+        let cartPrices = cart[l].price * cart[l].quantity;
+
+        // j'ajoute chaque quantité au total
+        totalQtyCalc.push(Number(cartQty));
+        // j'ajoute chaque prix au total
+        totalPriceCalc.push(cartPrices);
+
+      };
 
 
-// Gestion du bouton supprimmer
-const deleteBtn = document.getElementsByClassName('deleteItem');
+      // Je calcule le total
+      let totalQty = 0;
+      let totalPrice = 0;
 
-for (let j = 0; j < cart.length; j++) {
+      // je calacule la quantité totale
+      for (let m = 0; m < totalQtyCalc.length; m++) {
+        totalQty += totalQtyCalc[m];
+      };
 
-  deleteBtn[j].addEventListener('click', (event) => {
-    event.preventDefault();
+      // je calcule le prix total
+      for (let n = 0; n < totalPriceCalc.length; n++) {
+        totalPrice += totalPriceCalc[n];
+      };
 
-    // Récupération des éléments
-    // élément à supprimer du panier
-    const itemToDelete = cart.find(e => e.id === cart[j].id && e.color === cart[j].color);
+      // J'affiche les totaux
+      const affichageQty =
+        document
+          .getElementById('totalQuantity')
+          .innerHTML = totalQty;
 
-    // Balise à supprimer du DOM
-    const getArticleId = document.querySelector('[data-id="' + cart[j].id + '"]' + '[data-color="' + cart[j].color + '"]');
-
-    // Récupération de l'index de l'élément à supprimer
-    const index = cart.indexOf(itemToDelete);
-
-    // Suppression de l'élément
-    if (index > -1) {
-      cart.splice(index, 1);
-    }
-
-    // On met à jour les données au panier
-    localStorage.setItem("products", JSON.stringify(cart));
-
-    // suppression de la balise article
-    getArticleId.parentNode.removeChild(getArticleId);
-
-    // Mise à jour du prix et de la quantité
+      const affichagePrix =
+        document
+          .getElementById('totalPrice')
+          .innerHTML = totalPrice;
+    };
     getTotalPrice();
-    getCart();
+  })
+  .catch(function (err) {
+    console.log('erreur');
   });
-};
 
-
-
-
-// Détection de l'ajout de quantité
-const changeQty = document.getElementsByClassName('itemQuantity');
-
-for (let k = 0; k < cart.length; k++) {
-  changeQty[k].addEventListener('change', (event) => {
-    event.preventDefault();
-
-
-    const itemToChange = cart.find(e => e.id === cart[k].id && e.color === cart[k].color);
-
-    // on récupère la valeur de la quantité
-    const newQty = changeQty[k].value;
-
-    // on met à jour la nouvelle quantité
-    itemToChange.quantity = newQty;
-
-    // On ajoute les données au panier
-    localStorage.setItem("products", JSON.stringify(cart));
-
-    // Mise à jour de la quantité et du prix total
-    getTotalPrice();
-    getCart();
-  });
-};
-
-
-
-
-// CALCUL DU PRIX ET DE LA QUANTITÉ DU PANIER
-function getTotalPrice() {
-
-  let totalQtyCalc = [];
-  let totalPriceCalc = [];
-
-  // récuération des prix des produits
-  for (let l = 0; l < cart.length; l++) {
-
-    // je récupère les quantités
-    let cartQty = cart[l].quantity;
-
-    // je multiplie les prix par la quantité de chaque produit
-    let cartPrices = cart[l].price * cart[l].quantity;
-
-    // j'ajoute chaque quantité au total
-    totalQtyCalc.push(Number(cartQty));
-    // j'ajoute chaque prix au total
-    totalPriceCalc.push(cartPrices);
-
-  };
-
-
-  // Je calcule le total
-  let totalQty = 0;
-  let totalPrice = 0;
-
-  // je calacule la quantité totale
-  for (let m = 0; m < totalQtyCalc.length; m++) {
-    totalQty += totalQtyCalc[m];
-  };
-
-  // je calcule le prix total
-  for (let n = 0; n < totalPriceCalc.length; n++) {
-    totalPrice += totalPriceCalc[n];
-  };
-
-  // J'affiche les totaux
-  const affichageQty =
-    document
-      .getElementById('totalQuantity')
-      .innerHTML = totalQty;
-
-  const affichagePrix =
-    document
-      .getElementById('totalPrice')
-      .innerHTML = totalPrice;
-};
-getTotalPrice();
-
+getCart();
 
 
 // VALIDATION DU FORMULAIRE
@@ -233,8 +205,6 @@ if (form) {
 
 const htmlForm = document.querySelector('form');
 
-
-
 // BOUTON ENVOYER
 orderButton.addEventListener('click', (event) => {
   event.preventDefault();
@@ -249,12 +219,12 @@ orderButton.addEventListener('click', (event) => {
     const products = Object.values(cart).map((product) => {
       return product.id
     });
-  
+
     const order = {
       contact: form,
       products: products,
     };
-  
+
     async function post() {
       const waiting = await fetch('http://localhost:3000/api/products/order', {
         method: 'POST',
